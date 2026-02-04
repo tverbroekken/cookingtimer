@@ -10,52 +10,134 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \Meal.createdAt, order: .reverse) private var meals: [Meal]
+    @State private var showingAddMeal = false
 
     var body: some View {
-        NavigationSplitView {
+        NavigationStack {
             List {
-                ForEach(items) { item in
+                ForEach(meals) { meal in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        MealEditorView(meal: meal)
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        MealRow(meal: meal)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteMeals)
             }
+            .navigationTitle("My Meals")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: { showingAddMeal = true }) {
+                        Label("Add Meal", systemImage: "plus")
                     }
                 }
             }
-        } detail: {
-            Text("Select an item")
+            .sheet(isPresented: $showingAddMeal) {
+                AddMealView()
+            }
+            .overlay {
+                if meals.isEmpty {
+                    ContentUnavailableView(
+                        "No Meals Yet",
+                        systemImage: "fork.knife",
+                        description: Text("Add your first meal to get started")
+                    )
+                }
+            }
         }
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteMeals(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(meals[index])
             }
+        }
+    }
+}
+
+// MARK: - Meal Row
+struct MealRow: View {
+    let meal: Meal
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(meal.name)
+                .font(.headline)
+            
+            HStack {
+                Label("\(meal.timers.count) timers", systemImage: "timer")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                if meal.estimatedTotalTime > 0 {
+                    Text("•")
+                        .foregroundStyle(.secondary)
+                    
+                    Text(formatDuration(meal.estimatedTotalTime))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+    
+    private func formatDuration(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        if minutes < 60 {
+            return "\(minutes) min"
+        } else {
+            let hours = minutes / 60
+            let remainingMinutes = minutes % 60
+            return "\(hours)h \(remainingMinutes)m"
+        }
+    }
+}
+
+// MARK: - Add Meal View
+struct AddMealView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @State private var mealName = ""
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("Meal Name", text: $mealName)
+            }
+            .navigationTitle("New Meal")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        addMeal()
+                    }
+                    .disabled(mealName.isEmpty)
+                }
+            }
+        }
+    }
+    
+    private func addMeal() {
+        withAnimation {
+            let newMeal = Meal(name: mealName)
+            modelContext.insert(newMeal)
+            dismiss()
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Meal.self, inMemory: true)
 }

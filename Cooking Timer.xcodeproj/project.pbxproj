@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3B7B5B322F33E63000E9314A /* MealEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7B5B312F33E63000E9314A /* MealEditorView.swift */; };
+		3B7B5B342F33E66000E9314A /* ActiveCookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7B5B332F33E66000E9314A /* ActiveCookingView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3B33BCDA2F33D8DF0021499B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,8 @@
 		3B33BCC82F33D8DD0021499B /* Cooking Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cooking Timer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B33BCD92F33D8DF0021499B /* Cooking TimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cooking TimerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B33BCE32F33D8DF0021499B /* Cooking TimerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cooking TimerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B7B5B312F33E63000E9314A /* MealEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealEditorView.swift; sourceTree = "<group>"; };
+		3B7B5B332F33E66000E9314A /* ActiveCookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveCookingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,6 +99,8 @@
 				3B33BCDC2F33D8DF0021499B /* Cooking TimerTests */,
 				3B33BCE62F33D8DF0021499B /* Cooking TimerUITests */,
 				3B33BCC92F33D8DD0021499B /* Products */,
+				3B7B5B312F33E63000E9314A /* MealEditorView.swift */,
+				3B7B5B332F33E66000E9314A /* ActiveCookingView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -249,6 +258,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B7B5B322F33E63000E9314A /* MealEditorView.swift in Sources */,
+				3B7B5B342F33E66000E9314A /* ActiveCookingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

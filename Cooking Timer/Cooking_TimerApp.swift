@@ -12,7 +12,8 @@ import SwiftData
 struct Cooking_TimerApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Meal.self,
+            CookingTimer.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
