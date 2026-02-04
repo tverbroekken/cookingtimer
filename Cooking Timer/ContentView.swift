@@ -182,7 +182,6 @@ struct AddMealView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .buttonStyle(.glass)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
