@@ -15,12 +15,28 @@ struct Cooking_TimerApp: App {
             Meal.self,
             CookingTimer.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // If there's a schema mismatch, print error for debugging
+            print("ModelContainer creation failed: \(error)")
+            
+            // Try to create a fresh container by deleting old data
+            let url = modelConfiguration.url
+            try? FileManager.default.removeItem(at: url)
+            
+            // Create a new container
+            do {
+                return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            } catch {
+                fatalError("Could not create ModelContainer even after cleanup: \(error)")
+            }
         }
     }()
 
