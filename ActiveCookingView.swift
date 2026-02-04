@@ -80,16 +80,14 @@ struct ActiveCookingView: View {
         } label: {
             Label("Start Cooking", systemImage: "flame.fill")
                 .font(.title2)
-                .bold()
-                .foregroundStyle(.white)
+                .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.orange.gradient)
-                )
         }
-        .padding(.horizontal)
+        .buttonStyle(.glassProminent)
+        .tint(.orange)
+        .controlSize(.large)
+        .padding(.horizontal, 32)
     }
 }
 
@@ -107,35 +105,72 @@ struct BurnerView: View {
     var body: some View {
         Button(action: onTap) {
             ZStack {
-                // Burner base
+                // Outer glow
                 Circle()
-                    .fill(burnerColor)
-                    .frame(width: 150, height: 150)
-                    .overlay(
-                        Circle()
-                            .stroke(lineWidth: 8)
-                            .fill(ringColor)
-                    )
-                    .shadow(color: glowColor.opacity(glowIntensity), radius: 30)
+                    .fill(glowColor.gradient.opacity(glowIntensity * 0.5))
+                    .frame(width: 180, height: 180)
+                    .blur(radius: 20)
                 
-                // Timer info
-                VStack(spacing: 8) {
+                // Burner plate with coils
+                ZStack {
+                    // Base plate
+                    Circle()
+                        .fill(Color(white: 0.15))
+                        .frame(width: 160, height: 160)
+                    
+                    // Inner heating element
+                    Circle()
+                        .fill(burnerColor.gradient)
+                        .frame(width: 140, height: 140)
+                        .overlay {
+                            // Coil rings for stove effect
+                            ForEach(0..<3) { index in
+                                Circle()
+                                    .stroke(
+                                        Color.black.opacity(0.3),
+                                        lineWidth: 2
+                                    )
+                                    .frame(width: CGFloat(120 - (index * 25)))
+                            }
+                        }
+                    
+                    // Ring border
+                    Circle()
+                        .stroke(ringColor.gradient, lineWidth: 6)
+                        .frame(width: 160, height: 160)
+                }
+                .shadow(color: .black.opacity(0.4), radius: 10, y: 5)
+                
+                // Timer info overlay
+                VStack(spacing: 6) {
                     Text(timer.name)
-                        .font(.headline)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.6)
+                        .shadow(color: .black.opacity(0.5), radius: 2)
                     
                     Text(formattedTime)
-                        .font(.title2)
-                        .fontDesign(.monospaced)
-                        .bold()
+                        .font(.system(.title, design: .rounded, weight: .bold))
                         .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.6), radius: 3)
                     
                     if status != .waiting {
-                        Text(statusText)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.8))
+                        HStack(spacing: 4) {
+                            Image(systemName: statusIcon)
+                                .font(.caption2)
+                            Text(statusText)
+                                .font(.caption2)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundStyle(.white.opacity(0.9))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background {
+                            Capsule()
+                                .fill(.black.opacity(0.4))
+                        }
                     }
                 }
                 .padding()
@@ -153,26 +188,26 @@ struct BurnerView: View {
     private var burnerColor: Color {
         switch status {
         case .waiting:
-            return Color(white: 0.2)
+            return Color(white: 0.25)
         case .running:
-            return Color.orange.opacity(0.3)
+            return .orange
         case .paused:
-            return Color.yellow.opacity(0.2)
+            return .yellow
         case .completed:
-            return Color.green.opacity(0.2)
+            return .green
         }
     }
     
     private var ringColor: Color {
         switch status {
         case .waiting:
-            return Color(white: 0.3)
+            return Color(white: 0.4)
         case .running:
-            return Color.orange
+            return .red
         case .paused:
-            return Color.yellow
+            return .orange
         case .completed:
-            return Color.green
+            return .mint
         }
     }
     
@@ -192,13 +227,26 @@ struct BurnerView: View {
     private var statusText: String {
         switch status {
         case .waiting:
-            return "Waiting"
+            return "Tap to Start"
         case .running:
             return "Cooking"
         case .paused:
             return "Paused"
         case .completed:
             return "Done!"
+        }
+    }
+    
+    private var statusIcon: String {
+        switch status {
+        case .waiting:
+            return "hand.tap.fill"
+        case .running:
+            return "flame.fill"
+        case .paused:
+            return "pause.fill"
+        case .completed:
+            return "checkmark.circle.fill"
         }
     }
     
@@ -234,8 +282,12 @@ class TimerManager {
     }
     
     func setupTimers() {
+        // Reset all timers to waiting state when entering cooking view
         for timer in meal.timers {
-            timerStates[timer.id] = timer.status
+            timer.status = .waiting
+            timer.startTime = nil
+            timer.pausedTimeRemaining = nil
+            timerStates[timer.id] = .waiting
         }
     }
     
@@ -258,8 +310,8 @@ class TimerManager {
         timer.startTime = Date()
         timerStates[timer.id] = .running
         
-        // Check if any other timers should start based on this one
-        checkDependentTimers(for: timer)
+        // Check if any other timers should start based on this one starting
+        checkDependentTimersOnStart(for: timer)
     }
     
     func togglePause(_ timer: CookingTimer) {
@@ -306,28 +358,29 @@ class TimerManager {
         playCompletionFeedback()
         
         // Check if any timers should start when this one completes
-        checkDependentTimers(for: timer)
+        checkDependentTimersOnCompletion(for: timer)
     }
     
-    private func checkDependentTimers(for completedTimer: CookingTimer) {
+    private func checkDependentTimersOnStart(for startedTimer: CookingTimer) {
         for timer in meal.timers {
-            if timer.status == .waiting {
-                switch timer.triggerType {
-                case .afterTimer:
-                    if timer.triggerTimer?.id == completedTimer.id {
-                        // Schedule to start after delay
-                        DispatchQueue.main.asyncAfter(deadline: .now() + Double(timer.triggerDelay)) {
-                            if timer.status == .waiting {
-                                self.startTimer(timer)
-                            }
+            if timer.status == .waiting && timer.triggerType == .afterTimer {
+                if timer.triggerTimerID == startedTimer.id {
+                    // Schedule to start after delay from when this timer started
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(timer.triggerDelay)) {
+                        if timer.status == .waiting {
+                            self.startTimer(timer)
                         }
                     }
-                case .whenTimerCompletes:
-                    if timer.triggerTimer?.id == completedTimer.id && completedTimer.status == .completed {
-                        startTimer(timer)
-                    }
-                default:
-                    break
+                }
+            }
+        }
+    }
+    
+    private func checkDependentTimersOnCompletion(for completedTimer: CookingTimer) {
+        for timer in meal.timers {
+            if timer.status == .waiting && timer.triggerType == .whenTimerCompletes {
+                if timer.triggerTimerID == completedTimer.id {
+                    startTimer(timer)
                 }
             }
         }

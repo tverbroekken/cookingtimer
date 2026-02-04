@@ -30,30 +30,47 @@ final class CookingTimer {
     var id: UUID
     var name: String
     var durationSeconds: Int
-    var status: TimerStatus
-    var triggerType: TriggerType
+    var statusRawValue: String
+    var triggerTypeRawValue: String
     var triggerDelay: Int  // Offset in seconds for dependent timers
     var startTime: Date?
     var pausedTimeRemaining: Int?
+    var triggerTimerID: UUID?  // ID of the timer we depend on (instead of direct relationship)
     
     // Relationship
     var meal: Meal?
-    var triggerTimer: CookingTimer?  // Reference to the timer we depend on
     
     init(
         name: String,
         durationSeconds: Int,
         triggerType: TriggerType = .manual,
         triggerDelay: Int = 0,
-        triggerTimer: CookingTimer? = nil
+        triggerTimerID: UUID? = nil
     ) {
         self.id = UUID()
         self.name = name
         self.durationSeconds = durationSeconds
-        self.status = .waiting
-        self.triggerType = triggerType
+        self.statusRawValue = TimerStatus.waiting.rawValue
+        self.triggerTypeRawValue = triggerType.rawValue
         self.triggerDelay = triggerDelay
-        self.triggerTimer = triggerTimer
+        self.triggerTimerID = triggerTimerID
+    }
+    
+    // Helper computed properties for enum access
+    var status: TimerStatus {
+        get { TimerStatus(rawValue: statusRawValue) ?? .waiting }
+        set { statusRawValue = newValue.rawValue }
+    }
+    
+    var triggerType: TriggerType {
+        get { TriggerType(rawValue: triggerTypeRawValue) ?? .manual }
+        set { triggerTypeRawValue = newValue.rawValue }
+    }
+    
+    // Helper method to get the trigger timer from the meal
+    func getTriggerTimer(from meal: Meal) -> CookingTimer? {
+        guard let triggerID = triggerTimerID else { return nil }
+        return meal.timers.first { $0.id == triggerID }
     }
     
     // Computed property for remaining time
@@ -106,10 +123,10 @@ final class Meal {
         case .withMeal:
             return timer.durationSeconds
         case .afterTimer:
-            guard timer.triggerTimer != nil else { return timer.durationSeconds }
+            guard timer.triggerTimerID != nil else { return timer.durationSeconds }
             return timer.triggerDelay + timer.durationSeconds
         case .whenTimerCompletes:
-            guard let trigger = timer.triggerTimer else { return timer.durationSeconds }
+            guard let trigger = timer.getTriggerTimer(from: self) else { return timer.durationSeconds }
             return calculateTimerEndTime(trigger) + timer.durationSeconds
         }
     }
