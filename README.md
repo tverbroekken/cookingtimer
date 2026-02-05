@@ -89,6 +89,34 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
   <img src="Screenshots/cooking-view-5burners.png" width="250" alt="Cooking - 5 Burners">
 </div>
 
+### Recipe Integration
+<div align="center">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.12.20.png" width="250" alt="Recipe Library">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.12.34.png" width="250" alt="Recipe Details - Ingredients">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.12.46.png" width="250" alt="Recipe Details - Instructions">
+</div>
+
+### Create Meal from Recipe
+<div align="center">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.13.11.png" width="250" alt="Select Timers">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.13.23.png" width="250" alt="Generated Meal">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.13.37.png" width="250" alt="Sequential Timers">
+</div>
+
+### Manual Recipe Creation
+<div align="center">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.15.26.png" width="250" alt="New Recipe Form">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.14.27.png" width="250" alt="Edit Recipe - Details">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.14.37.png" width="250" alt="Edit Recipe - Steps">
+</div>
+
+### Import & Completion
+<div align="center">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.15.12.png" width="250" alt="Import Recipe">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.16.45.png" width="250" alt="Timer Completion Alert">
+  <img src="Screenshots/Screenshot 2026-02-05 at 22.13.52.png" width="250" alt="Meal Created">
+</div>
+
 ## 🛠 Technical Details
 
 ### Built With
