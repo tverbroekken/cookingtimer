@@ -49,6 +49,14 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 - Shows timer name and meal context
 - Prominent "Stop" button to dismiss
 
+### 🎙️ Siri Integration
+- **Voice control** for hands-free cooking
+- **"Start cooking [meal name]"** - Begin cooking a saved meal
+- **"List my meals"** - Hear all your saved meals
+- **App Shortcuts** for quick access from Spotlight and Siri
+- **Siri suggestions** based on your cooking patterns
+- Seamless integration with Apple Intelligence
+
 ## 📸 Screenshots
 
 ### Meal Management
@@ -77,6 +85,7 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 - **SwiftData**: Apple's latest data persistence framework
 - **CloudKit**: Automatic cloud sync across devices
 - **Liquid Glass**: Apple's newest design system
+- **App Intents**: Siri and Shortcuts integration
 - **Combine**: Reactive timer management
 
 ### Requirements
@@ -99,6 +108,9 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 - Custom burner views with animated glow effects
 - Critical alert notifications with `AudioServicesPlaySystemSound` for repeating timer sounds
 - Full-screen timer completion view with animated UI
+- App Intents with `MealEntity`, `StartCookingIntent`, and `ListMealsIntent`
+- `AppShortcutsProvider` for Siri phrase registration
+- `SiriTipView` components for user discoverability
 
 ## 🚀 Getting Started
 
@@ -131,6 +143,17 @@ For advanced coordination:
 
 Everything finishes at the same time!
 
+### Using Siri
+Voice commands for hands-free cooking:
+- **"Hey Siri, start cooking Pasta Dinner in Cooking Timer"**
+- **"Hey Siri, list my meals in Cooking Timer"**
+- **"Hey Siri, show my meals in Cooking Timer"**
+
+App Shortcuts also appear in:
+- Spotlight search
+- Shortcuts app
+- Siri suggestions
+
 ## 🎨 Design Philosophy
 
 This app embraces Apple's design principles:
@@ -145,9 +168,9 @@ The stove burner metaphor provides an intuitive, skeuomorphic interface that mak
 - [ ] Apple Watch companion app
 - [ ] Widget support for home screen
 - [ ] Recipe integration
-- [ ] Voice timer control with Siri
 - [ ] Timer templates for common dishes
 - [ ] Share meals with family/friends
+- [ ] Add timers via Siri with natural language ("Add 10 minute pasta timer")
 
 ## 🤝 Contributing
 

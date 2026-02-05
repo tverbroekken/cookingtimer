@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3B6EBDA72F352D41001CC3D1 /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B6EBDA62F352D41001CC3D1 /* AppIntents.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3B33BCDA2F33D8DF0021499B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		3B33BCC82F33D8DD0021499B /* Cooking Timer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cooking Timer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B33BCD92F33D8DF0021499B /* Cooking TimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cooking TimerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B33BCE32F33D8DF0021499B /* Cooking TimerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Cooking TimerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B6EBDA62F352D41001CC3D1 /* AppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -92,6 +97,7 @@
 				3B33BCDC2F33D8DF0021499B /* Cooking TimerTests */,
 				3B33BCE62F33D8DF0021499B /* Cooking TimerUITests */,
 				3B33BCC92F33D8DD0021499B /* Products */,
+				3B6EBDA62F352D41001CC3D1 /* AppIntents.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -249,6 +255,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B6EBDA72F352D41001CC3D1 /* AppIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

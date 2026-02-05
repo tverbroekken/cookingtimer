@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import AppIntents
 
 @main
 struct Cooking_TimerApp: App {
@@ -18,6 +19,9 @@ struct Cooking_TimerApp: App {
         
         // Request notification permissions on launch
         requestNotificationPermissions()
+        
+        // Update App Shortcuts
+        CookingTimerShortcuts.updateAppShortcutParameters()
     }
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
