@@ -41,6 +41,14 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 - Haptic feedback on timer completion
 - Persistent storage with SwiftData + CloudKit sync
 
+### 🔔 Timer Completion Notifications
+- **Full-screen alert** when timers complete (like Clock app)
+- **Repeating timer sound** that plays until dismissed
+- **Critical alerts** that bypass silent mode and Do Not Disturb
+- **Background notifications** when app is not active
+- Shows timer name and meal context
+- Prominent "Stop" button to dismiss
+
 ## 📸 Screenshots
 
 ### Meal Management
@@ -89,6 +97,8 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 - Real-time timer coordination with `DispatchQueue` scheduling
 - Liquid Glass effects using `.glassProminent` and `.glass` button styles
 - Custom burner views with animated glow effects
+- Critical alert notifications with `AudioServicesPlaySystemSound` for repeating timer sounds
+- Full-screen timer completion view with animated UI
 
 ## 🚀 Getting Started
 
@@ -137,7 +147,6 @@ The stove burner metaphor provides an intuitive, skeuomorphic interface that mak
 - [ ] Recipe integration
 - [ ] Voice timer control with Siri
 - [ ] Timer templates for common dishes
-- [ ] Notifications for timer completion
 - [ ] Share meals with family/friends
 
 ## 🤝 Contributing
