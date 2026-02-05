@@ -16,14 +16,15 @@ class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         UNUserNotificationCenter.current().delegate = self
     }
     
-    // Show notification even when app is in foreground
+    // Don't show notification banner when app is in foreground (we show full-screen view instead)
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Show banner, play sound, and show in notification list
-        completionHandler([.banner, .sound, .list])
+        // Only add to notification list, don't show banner or play sound
+        // The full-screen TimerCompletionView handles that
+        completionHandler([.list])
     }
     
     // Handle notification actions

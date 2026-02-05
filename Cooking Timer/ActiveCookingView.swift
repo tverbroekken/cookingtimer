@@ -55,16 +55,25 @@ struct ActiveCookingView: View {
             .onAppear {
                 timerManager.setupTimers()
                 timerManager.onTimerComplete = { timer in
-                    completedTimer = timer
-                    showingCompletionView = true
+                    withAnimation(.easeIn(duration: 0.2)) {
+                        completedTimer = timer
+                        showingCompletionView = true
+                    }
                 }
+                
+                // Remove ALL pending notifications when cooking view is active
+                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
             }
             .onDisappear {
                 timerManager.stopAll()
+                
+                // Schedule notifications for all running timers when leaving
+                timerManager.scheduleBackgroundNotifications()
             }
-            .fullScreenCover(isPresented: $showingCompletionView) {
-                if let timer = completedTimer {
+            .overlay {
+                if showingCompletionView, let timer = completedTimer {
                     TimerCompletionView(timer: timer, meal: meal)
+                        .transition(.opacity)
                 }
             }
         }
@@ -323,8 +332,8 @@ class TimerManager {
         timer.startTime = Date()
         timerStates[timer.id] = .running
         
-        // Schedule notification for when timer completes
-        scheduleNotification(for: timer)
+        // Don't schedule notifications - we handle completion with full-screen view
+        // Notifications are only needed if app goes to background
         
         // Check if any other timers should start based on this one starting
         checkDependentTimersOnStart(for: timer)
@@ -382,7 +391,7 @@ class TimerManager {
         // Play completion sound/haptic
         playCompletionFeedback()
         
-        // Show full-screen completion view
+        // Show full-screen completion view immediately (no async delay)
         onTimerComplete?(timer)
         
         // Check if any timers should start when this one completes
@@ -464,10 +473,19 @@ class TimerManager {
         )
     }
     
-    private func cancelAllNotifications() {
+    func cancelAllNotifications() {
         let identifiers = meal.timers.map { $0.id.uuidString }
         UNUserNotificationCenter.current().removePendingNotificationRequests(
             withIdentifiers: identifiers
         )
+    }
+    
+    func scheduleBackgroundNotifications() {
+        // Schedule notifications for all running timers when app goes to background
+        for timer in meal.timers {
+            if timer.status == .running && timer.remainingSeconds > 0 {
+                scheduleNotification(for: timer)
+            }
+        }
     }
 }
