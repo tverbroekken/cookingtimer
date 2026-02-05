@@ -12,6 +12,7 @@ struct RecipeLibraryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Recipe.createdAt, order: .reverse) private var recipes: [Recipe]
     @State private var showingImportRecipe = false
+    @State private var showingCreateRecipe = false
     @State private var searchText = ""
     
     private var filteredRecipes: [Recipe] {
@@ -45,14 +46,29 @@ struct RecipeLibraryView: View {
             .searchable(text: $searchText, prompt: "Search recipes")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: { showingImportRecipe = true }) {
-                        Label("Import Recipe", systemImage: "plus")
+                    Menu {
+                        Button {
+                            showingCreateRecipe = true
+                        } label: {
+                            Label("Create Recipe", systemImage: "pencil")
+                        }
+                        
+                        Button {
+                            showingImportRecipe = true
+                        } label: {
+                            Label("Import from Website", systemImage: "link")
+                        }
+                    } label: {
+                        Label("Add Recipe", systemImage: "plus")
                     }
                     .buttonStyle(.glassProminent)
                 }
             }
             .sheet(isPresented: $showingImportRecipe) {
                 RecipeImportView()
+            }
+            .sheet(isPresented: $showingCreateRecipe) {
+                RecipeEditorView()
             }
             .overlay {
                 if recipes.isEmpty {

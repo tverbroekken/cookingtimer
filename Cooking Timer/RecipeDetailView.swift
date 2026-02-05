@@ -15,6 +15,7 @@ struct RecipeDetailView: View {
     let recipe: Recipe
     @State private var showingDeleteAlert = false
     @State private var showingCreateMeal = false
+    @State private var showingEditRecipe = false
     @State private var newMealName = ""
     @State private var createdMeal: Meal?
     
@@ -159,6 +160,14 @@ struct RecipeDetailView: View {
         .navigationTitle(recipe.name)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingEditRecipe = true
+                } label: {
+                    Label("Edit", systemImage: "pencil")
+                }
+            }
+            
             ToolbarItem(placement: .destructiveAction) {
                 Button(role: .destructive) {
                     showingDeleteAlert = true
@@ -177,6 +186,9 @@ struct RecipeDetailView: View {
         }
         .sheet(isPresented: $showingCreateMeal) {
             CreateMealFromRecipeView(recipe: recipe, mealName: $newMealName, createdMeal: $createdMeal)
+        }
+        .sheet(isPresented: $showingEditRecipe) {
+            RecipeEditorView(recipe: recipe)
         }
         .navigationDestination(item: $createdMeal) { meal in
             MealEditorView(meal: meal)

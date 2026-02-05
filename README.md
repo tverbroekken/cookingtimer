@@ -59,11 +59,14 @@ A beautiful iOS cooking timer app that helps you coordinate multiple dishes for 
 
 ### 📖 Recipe Integration
 - **Import from websites** - Automatically parse recipes from URLs
+- **Manual recipe creation** - Create and edit recipes by hand with full control
 - **JSON-LD parsing** - Extract ingredients, instructions, and cooking times
 - **Recipe library** - Browse and search your recipe collection
+- **Ingredient management** - Add, edit, and organize ingredients with quantities
+- **Step-by-step instructions** - Reorderable cooking steps with optional timers
 - **Create meals from recipes** - Auto-generate sequential timers from recipe steps
 - **Smart timer selection** - Choose which timed steps become timers
-- **Seamless workflow** - Import → Browse → Create Meal → Cook
+- **Seamless workflow** - Import/Create → Edit → Create Meal → Cook
 
 ## 📸 Screenshots
 
@@ -178,8 +181,9 @@ The stove burner metaphor provides an intuitive, skeuomorphic interface that mak
 - [ ] Timer templates for common dishes
 - [ ] Share meals with family/friends
 - [ ] Add timers via Siri with natural language ("Add 10 minute pasta timer")
-- [ ] Manual recipe creation and editing
 - [ ] Recipe categories and tags
+- [ ] Recipe photo upload
+- [ ] Nutrition information
 
 ## 🤝 Contributing
 
