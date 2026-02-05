@@ -7,16 +7,25 @@
 
 import SwiftUI
 import SwiftData
+import AppIntents
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Meal.createdAt, order: .reverse) private var meals: [Meal]
     @State private var showingAddMeal = false
+    @State private var showSiriTip = true
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 16) {
+                    // Siri Tip
+                    if !meals.isEmpty && showSiriTip {
+                        SiriTipView(intent: ListMealsIntent(), isVisible: $showSiriTip)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                    }
+                    
                     ForEach(meals) { meal in
                         NavigationLink {
                             MealEditorView(meal: meal)
