@@ -27,6 +27,9 @@ struct Cooking_TimerApp: App {
         let schema = Schema([
             Meal.self,
             CookingTimer.self,
+            Recipe.self,
+            RecipeIngredient.self,
+            RecipeStep.self,
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,

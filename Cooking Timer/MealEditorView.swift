@@ -74,7 +74,7 @@ struct MealEditorView: View {
                         )
                         .padding(.vertical, 60)
                     } else {
-                        ForEach(meal.timers) { timer in
+                        ForEach(meal.timers.sorted(by: { $0.orderIndex < $1.orderIndex })) { timer in
                             NavigationLink {
                                 TimerDetailView(timer: timer, meal: meal)
                             } label: {

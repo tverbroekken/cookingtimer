@@ -9,6 +9,23 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    var body: some View {
+        TabView {
+            MealsListView()
+                .tabItem {
+                    Label("Meals", systemImage: "fork.knife")
+                }
+            
+            RecipeLibraryView()
+                .tabItem {
+                    Label("Recipes", systemImage: "book")
+                }
+        }
+    }
+}
+
+// MARK: - Meals List View
+struct MealsListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Meal.createdAt, order: .reverse) private var meals: [Meal]
     @State private var showingAddMeal = false
@@ -24,6 +41,20 @@ struct ContentView: View {
                             MealCard(meal: meal)
                         }
                         .buttonStyle(.plain)
+                        .contextMenu {
+                            Button(role: .destructive) {
+                                deleteMeal(meal)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                deleteMeal(meal)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                 }
                 .padding()
@@ -53,11 +84,9 @@ struct ContentView: View {
         }
     }
 
-    private func deleteMeals(offsets: IndexSet) {
+    private func deleteMeal(_ meal: Meal) {
         withAnimation {
-            for index in offsets {
-                modelContext.delete(meals[index])
-            }
+            modelContext.delete(meal)
         }
     }
 }
