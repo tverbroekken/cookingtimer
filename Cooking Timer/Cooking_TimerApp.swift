@@ -13,6 +13,9 @@ import UserNotifications
 struct Cooking_TimerApp: App {
     
     init() {
+        // Initialize notification manager (sets up delegate)
+        _ = NotificationManager.shared
+        
         // Request notification permissions on launch
         requestNotificationPermissions()
     }
@@ -54,12 +57,35 @@ struct Cooking_TimerApp: App {
     }
     
     private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        let center = UNUserNotificationCenter.current()
+        
+        // Request authorization including critical alerts for persistent timer notifications
+        center.requestAuthorization(options: [.alert, .sound, .badge, .criticalAlert]) { granted, error in
             if granted {
                 print("Notification permission granted")
+                
+                // Register notification categories with actions
+                self.registerNotificationCategories()
             } else if let error = error {
                 print("Notification permission error: \(error)")
             }
         }
+    }
+    
+    private func registerNotificationCategories() {
+        let stopAction = UNNotificationAction(
+            identifier: "STOP_TIMER",
+            title: "Stop",
+            options: [.destructive]
+        )
+        
+        let category = UNNotificationCategory(
+            identifier: "TIMER_COMPLETE",
+            actions: [stopAction],
+            intentIdentifiers: [],
+            options: [.customDismissAction]
+        )
+        
+        UNUserNotificationCenter.current().setNotificationCategories([category])
     }
 }

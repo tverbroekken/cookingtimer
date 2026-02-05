@@ -15,6 +15,8 @@ struct ActiveCookingView: View {
     let meal: Meal
     
     @State private var timerManager: TimerManager
+    @State private var showingCompletionView = false
+    @State private var completedTimer: CookingTimer?
     
     init(meal: Meal) {
         self.meal = meal
@@ -52,9 +54,18 @@ struct ActiveCookingView: View {
             }
             .onAppear {
                 timerManager.setupTimers()
+                timerManager.onTimerComplete = { timer in
+                    completedTimer = timer
+                    showingCompletionView = true
+                }
             }
             .onDisappear {
                 timerManager.stopAll()
+            }
+            .fullScreenCover(isPresented: $showingCompletionView) {
+                if let timer = completedTimer {
+                    TimerCompletionView(timer: timer, meal: meal)
+                }
             }
         }
     }
@@ -275,6 +286,7 @@ class TimerManager {
     let meal: Meal
     var timerStates: [UUID: TimerStatus] = [:]
     var hasStarted = false
+    var onTimerComplete: ((CookingTimer) -> Void)?
     
     private var updateTimer: Timer?
     
@@ -370,6 +382,9 @@ class TimerManager {
         // Play completion sound/haptic
         playCompletionFeedback()
         
+        // Show full-screen completion view
+        onTimerComplete?(timer)
+        
         // Check if any timers should start when this one completes
         checkDependentTimersOnCompletion(for: timer)
     }
@@ -409,10 +424,20 @@ class TimerManager {
     
     private func scheduleNotification(for timer: CookingTimer) {
         let content = UNMutableNotificationContent()
-        content.title = "\(timer.name) is done!"
-        content.body = "Your timer for \(meal.name) has completed"
-        content.sound = .defaultCritical
+        content.title = timer.name
+        content.body = meal.name
         content.categoryIdentifier = "TIMER_COMPLETE"
+        
+        // Use critical alert sound (bypasses silent mode and plays repeatedly)
+        content.sound = UNNotificationSound.defaultCritical
+        content.interruptionLevel = .timeSensitive
+        
+        // Add user info for handling actions
+        content.userInfo = [
+            "timerId": timer.id.uuidString,
+            "timerName": timer.name,
+            "mealName": meal.name
+        ]
         
         // Schedule notification for when timer completes
         let trigger = UNTimeIntervalNotificationTrigger(
