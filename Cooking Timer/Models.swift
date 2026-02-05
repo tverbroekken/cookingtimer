@@ -36,6 +36,7 @@ final class CookingTimer {
     var startTime: Date?
     var pausedTimeRemaining: Int?
     var triggerTimerID: UUID?  // ID of the timer we depend on (instead of direct relationship)
+    var orderIndex: Int  // Display order in the meal
     
     // Relationship
     var meal: Meal?
@@ -45,7 +46,8 @@ final class CookingTimer {
         durationSeconds: Int,
         triggerType: TriggerType = .manual,
         triggerDelay: Int = 0,
-        triggerTimerID: UUID? = nil
+        triggerTimerID: UUID? = nil,
+        orderIndex: Int = 0
     ) {
         self.id = UUID()
         self.name = name
@@ -54,6 +56,7 @@ final class CookingTimer {
         self.triggerTypeRawValue = triggerType.rawValue
         self.triggerDelay = triggerDelay
         self.triggerTimerID = triggerTimerID
+        self.orderIndex = orderIndex
     }
     
     // Helper computed properties for enum access
@@ -129,5 +132,100 @@ final class Meal {
             guard let trigger = timer.getTriggerTimer(from: self) else { return timer.durationSeconds }
             return calculateTimerEndTime(trigger) + timer.durationSeconds
         }
+    }
+}
+
+// MARK: - Recipe Difficulty
+enum RecipeDifficulty: String, Codable {
+    case easy = "Easy"
+    case medium = "Medium"
+    case hard = "Hard"
+}
+
+// MARK: - Recipe Model
+@Model
+final class Recipe {
+    var id: UUID
+    var name: String
+    var recipeDescription: String?
+    var sourceURL: String?
+    var imageURL: String?
+    var createdAt: Date
+    var prepTimeSeconds: Int
+    var cookTimeSeconds: Int
+    var servings: Int
+    var difficultyRawValue: String
+    var ingredients: [RecipeIngredient]
+    var steps: [RecipeStep]
+    
+    // Optional relationship to meals
+    var mealID: UUID?
+    
+    init(name: String, description: String? = nil, sourceURL: String? = nil) {
+        self.id = UUID()
+        self.name = name
+        self.recipeDescription = description
+        self.sourceURL = sourceURL
+        self.createdAt = Date()
+        self.prepTimeSeconds = 0
+        self.cookTimeSeconds = 0
+        self.servings = 1
+        self.difficultyRawValue = RecipeDifficulty.medium.rawValue
+        self.ingredients = []
+        self.steps = []
+    }
+    
+    var difficulty: RecipeDifficulty {
+        get { RecipeDifficulty(rawValue: difficultyRawValue) ?? .medium }
+        set { difficultyRawValue = newValue.rawValue }
+    }
+    
+    var totalTimeSeconds: Int {
+        prepTimeSeconds + cookTimeSeconds
+    }
+    
+    func getMeal(from context: ModelContext) -> Meal? {
+        guard let mealID = mealID else { return nil }
+        let descriptor = FetchDescriptor<Meal>()
+        let meals = try? context.fetch(descriptor)
+        return meals?.first { $0.id == mealID }
+    }
+}
+
+// MARK: - Recipe Ingredient Model
+@Model
+final class RecipeIngredient {
+    var id: UUID
+    var name: String
+    var quantity: Double
+    var unit: String
+    var notes: String?
+    
+    var recipe: Recipe?
+    
+    init(name: String, quantity: Double = 0, unit: String = "") {
+        self.id = UUID()
+        self.name = name
+        self.quantity = quantity
+        self.unit = unit
+    }
+}
+
+// MARK: - Recipe Step Model
+@Model
+final class RecipeStep {
+    var id: UUID
+    var orderIndex: Int
+    var instruction: String
+    var durationSeconds: Int?
+    var temperature: String?
+    
+    var recipe: Recipe?
+    
+    init(orderIndex: Int, instruction: String, durationSeconds: Int? = nil) {
+        self.id = UUID()
+        self.orderIndex = orderIndex
+        self.instruction = instruction
+        self.durationSeconds = durationSeconds
     }
 }

@@ -83,7 +83,7 @@ struct ActiveCookingView: View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: 20), count: 2)
         
         return LazyVGrid(columns: columns, spacing: 20) {
-            ForEach(meal.timers) { timer in
+            ForEach(meal.timers.sorted(by: { $0.orderIndex < $1.orderIndex })) { timer in
                 BurnerView(
                     timer: timer,
                     status: timerManager.timerStates[timer.id] ?? .waiting,

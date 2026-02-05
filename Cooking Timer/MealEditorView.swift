@@ -10,10 +10,12 @@ import SwiftData
 
 struct MealEditorView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     let meal: Meal
     
     @State private var showingAddTimer = false
     @State private var showingCookingView = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         ScrollView {
@@ -74,7 +76,7 @@ struct MealEditorView: View {
                         )
                         .padding(.vertical, 60)
                     } else {
-                        ForEach(meal.timers) { timer in
+                        ForEach(meal.timers.sorted(by: { $0.orderIndex < $1.orderIndex })) { timer in
                             NavigationLink {
                                 TimerDetailView(timer: timer, meal: meal)
                             } label: {
@@ -100,6 +102,14 @@ struct MealEditorView: View {
                 }
                 .buttonStyle(.glassProminent)
             }
+            
+            ToolbarItem(placement: .destructiveAction) {
+                Button(role: .destructive) {
+                    showingDeleteAlert = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
         }
         .sheet(isPresented: $showingAddTimer) {
             AddTimerView(meal: meal)
@@ -107,6 +117,20 @@ struct MealEditorView: View {
         .fullScreenCover(isPresented: $showingCookingView) {
             ActiveCookingView(meal: meal)
         }
+        .alert("Delete Meal?", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                deleteMeal()
+            }
+        } message: {
+            Text("This will delete the meal and all its timers. This action cannot be undone.")
+        }
+    }
+    
+    private func deleteMeal() {
+        modelContext.delete(meal)
+        try? modelContext.save()
+        dismiss()
     }
     
     private func formatDuration(_ seconds: Int) -> String {
