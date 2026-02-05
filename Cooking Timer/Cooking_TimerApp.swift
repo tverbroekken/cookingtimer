@@ -7,9 +7,15 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct Cooking_TimerApp: App {
+    
+    init() {
+        // Request notification permissions on launch
+        requestNotificationPermissions()
+    }
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Meal.self,
@@ -45,5 +51,15 @@ struct Cooking_TimerApp: App {
             ContentView()
         }
         .modelContainer(sharedModelContainer)
+    }
+    
+    private func requestNotificationPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                print("Notification permission granted")
+            } else if let error = error {
+                print("Notification permission error: \(error)")
+            }
+        }
     }
 }

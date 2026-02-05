@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 import Combine
 
 struct ActiveCookingView: View {
@@ -310,6 +311,9 @@ class TimerManager {
         timer.startTime = Date()
         timerStates[timer.id] = .running
         
+        // Schedule notification for when timer completes
+        scheduleNotification(for: timer)
+        
         // Check if any other timers should start based on this one starting
         checkDependentTimersOnStart(for: timer)
     }
@@ -319,11 +323,17 @@ class TimerManager {
             timer.status = .paused
             timer.pausedTimeRemaining = timer.remainingSeconds
             timerStates[timer.id] = .paused
+            
+            // Cancel notification when paused
+            cancelNotification(for: timer)
         } else if timer.status == .paused {
             timer.status = .running
             timer.startTime = Date().addingTimeInterval(-Double(timer.durationSeconds - (timer.pausedTimeRemaining ?? 0)))
             timer.pausedTimeRemaining = nil
             timerStates[timer.id] = .running
+            
+            // Reschedule notification when resuming
+            scheduleNotification(for: timer)
         } else if timer.status == .waiting {
             startTimer(timer)
         }
@@ -332,6 +342,9 @@ class TimerManager {
     func stopAll() {
         updateTimer?.invalidate()
         updateTimer = nil
+        
+        // Cancel all pending notifications
+        cancelAllNotifications()
     }
     
     private func startMonitoring() {
@@ -390,7 +403,46 @@ class TimerManager {
         // Haptic feedback
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
+    }
+    
+    // MARK: - Notification Management
+    
+    private func scheduleNotification(for timer: CookingTimer) {
+        let content = UNMutableNotificationContent()
+        content.title = "\(timer.name) is done!"
+        content.body = "Your timer for \(meal.name) has completed"
+        content.sound = .defaultCritical
+        content.categoryIdentifier = "TIMER_COMPLETE"
         
-        // TODO: Add sound notification
+        // Schedule notification for when timer completes
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: TimeInterval(timer.remainingSeconds),
+            repeats: false
+        )
+        
+        let request = UNNotificationRequest(
+            identifier: timer.id.uuidString,
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error)")
+            }
+        }
+    }
+    
+    private func cancelNotification(for timer: CookingTimer) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: [timer.id.uuidString]
+        )
+    }
+    
+    private func cancelAllNotifications() {
+        let identifiers = meal.timers.map { $0.id.uuidString }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(
+            withIdentifiers: identifiers
+        )
     }
 }
